@@ -1,0 +1,202 @@
+++<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>🎀 Trò chơi Túi Bí Ẩn 🎀</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600&display=swap');
+
+    body {
+      font-family: 'Baloo 2', cursive;
+      background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+      text-align: center;
+      padding: 30px;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 36px;
+      color: #333;
+      background: #fff799;
+      display: inline-block;
+      padding: 20px 30px;
+      border-radius: 15px;
+      box-shadow: 4px 4px 12px rgba(0,0,0,0.3);
+      border: 2px dashed #f2c94c;
+      text-shadow: 1px 1px #fff;
+      margin-bottom: 40px;
+    }
+
+    .bagRow {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .bag {
+      width: 150px;
+      height: 150px;
+      line-height: 150px;
+      background: #fff3cd;
+      border-radius: 20px;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .bag:hover {
+      transform: scale(1.1) rotate(-3deg);
+      background: #ffe0ac;
+    }
+
+    .bag.open {
+      animation: pop 0.4s ease forwards;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.2) rotate(5deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    #quizBox {
+      margin-top: 30px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      display: none;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+
+    #quizQuestion {
+      font-size: 28px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    #quizOptions {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .optionBtn {
+      padding: 10px 15px;
+      border-radius: 15px;
+      background: #ff9aa2;
+      color: white;
+      cursor: pointer;
+      min-width: 120px;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .optionBtn:hover {
+      transform: scale(1.05);
+      background: #ff758f;
+    }
+
+    #checkBtn {
+      display: block;
+      margin: 20px auto 0 auto;
+      padding: 12px 25px;
+      font-size: 20px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ff758f, #ff9aa2);
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: all 0.2s ease-in-out;
+    }
+
+    #checkBtn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    }
+
+    #result {
+      margin-top: 15px;
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎀 Trò chơi Túi Bí Ẩn 🎀</h1>
+
+  <div class="bagRow">
+    <div class="bag" onclick="openBag(0)">🎁 Túi 1</div>
+    <div class="bag" onclick="openBag(1)">🎁 Túi 2</div>
+    <div class="bag" onclick="openBag(2)">🎁 Túi 3</div>
+    <div class="bag" onclick="openBag(3)">🎁 Túi 4</div>
+    <div class="bag" onclick="openBag(4)">🎁 Túi 5</div>
+  </div>
+
+  <div id="quizBox">
+    <div id="quizQuestion"></div>
+    <div id="quizOptions"></div>
+    <button id="checkBtn" onclick="checkAnswer()">Kiểm tra đáp án ✅</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const questions = [
+      { q: "Trường THPT Buôn Hồ được thành lập vào năm nào?", a: ["A. 1975", "B. 1977", "C. 1980", "D. 1985"], correct: 1 },
+      { q: "Ban đầu, Trường THPT Buôn Hồ có bao nhiêu khối lớp?", a: ["A. 1 khối", "B. 2 khối", "C. 3 khối", "D. 4 khối"], correct: 2 },
+      { q: "Tên hiệu trưởng đầu tiên của Trường THPT Buôn Hồ là gì?", a: ["A. Nguyễn Văn A", "B. Trần Thị B", "C. Lê Văn C", "D. Phạm Thị D"], correct: 0 },
+      { q: "Trường THPT Chuyên Nguyễn Du được thành lập vào năm nào?", a: ["A. 1975", "B. 1978", "C. 1981", "D. 1985"], correct: 1 },
+      { q: "Trường THPT Đông Du nằm ở thành phố nào?", a: ["A. Buôn Ma Thuột", "B. Buôn Hồ", "C. Ea Kar", "D. Krông Pắk"], correct: 0 }
+    ];
+
+    let currentQuestion = null;
+    let selectedAnswer = null;
+
+    function openBag(index) {
+      document.querySelectorAll('.bag').forEach((bag) => bag.classList.remove('open'));
+      const bag = document.querySelectorAll('.bag')[index];
+      bag.classList.add('open');
+
+      currentQuestion = questions[index];
+      selectedAnswer = null;
+      document.getElementById("quizBox").style.display = "block";
+      document.getElementById("quizQuestion").textContent = currentQuestion.q;
+      document.getElementById("result").textContent = "";
+
+      const optionsDiv = document.getElementById("quizOptions");
+      optionsDiv.innerHTML = "";
+      currentQuestion.a.forEach((option, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.className = "optionBtn";
+        btn.style.marginTop = Math.floor(Math.random()*10) + "px";
+        btn.onclick = () => { selectedAnswer = i; };
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer() {
+      if (selectedAnswer === null) {
+        document.getElementById("result").textContent = "⚠️ Hãy chọn một đáp án trước!";
+        document.getElementById("result").style.color = "orange";
+        return;
+      }
+      if (selectedAnswer === currentQuestion.correct) {
+        document.getElementById("result").textContent = "🎉 Chính xác! Bạn giỏi quá!";
+        document.getElementById("result").style.color = "green";
+      } else {
+        document.getElementById("result").textContent = "❌ Sai rồi! Thử lại nhé!";
+        document.getElementById("result").style.color = "red";
+      }
+    }
+  </script>
+</body>
+</html>
